@@ -1,0 +1,55 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+    echo "Usage: $0 <Model Name> <Sleep Time>"
+    echo "<Model Name> is mandatory" 
+    echo "<Sleep Time> is the time before we start to submit. It is optional" 
+    exit 1
+fi
+if [ -z $2 ]
+then
+  time=0
+else
+  time=$2
+fi
+
+MODELNAME=$1
+CONFIGFILE="aws-deepracer.cf"
+
+if [ -f $CONFIGFILE ]; then
+        EMAIL=$(grep -i EMAIL $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+else
+        echo "The config file $CONFIGFILE is not found"
+        exit 1
+fi
+
+if [ -z $EMAIL ]; then
+        read -p 'Email: ' EMAIL
+fi
+
+source ./aws-authenticate
+
+sleep $time
+while date;
+do
+  submissionStatus=$(./aws-createLeaderboardSubmission $MODELNAME | jq '.Message')
+  if [ "$submissionStatus" != 'null' ]
+  then
+    echo $submissionStatus
+    echo "${submissionStatus}" | mailx -s "Deepracer Submission" $EMAIL
+    exit 1
+  fi
+  sleep 300
+  latestStatus='"RUNNING"'
+  while [ $latestStatus == '"RUNNING"' ]
+  do
+    latestUserSubmission=$(./aws-getLatestUserSubmission)
+    latestStatus=$(echo $latestUserSubmission | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
+    lapTime=$(echo $latestUserSubmission | jq '.LeaderboardSubmission.AvgLapTime')
+    echo $latestStatus $lapTime
+    sleep 10
+  done
+  echo "${latestStatus}: ${lapTime}" | mailx -s "Deepracer Submission" $EMAIL
+  sleep 1600
+done
+ 

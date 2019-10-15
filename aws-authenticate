@@ -1,0 +1,83 @@
+#!/bin/bash
+
+if [[ $0 ==  *"aws-authenticate"* ]]; then
+    echo "Please use 'source ./aws-authenticate'"
+    exit 1
+fi
+
+CONFIGFILE="aws-deepracer.cf"
+
+if [ ! -z "$AWS_COOKIE" ]; then
+   ./aws-getLatestUserSubmission | jq '.error[0]' | grep authenticate > /dev/null
+   if [ $? == 1 ]; then
+       return 0
+   fi
+fi
+
+if [ -f $CONFIGFILE ]; then
+        ACCOUNTID=$(grep -i ACCOUNTID $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+        USERNAME=$(grep -i USERNAME $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+        PASSWORD=$(grep -i PASSWORD $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+else
+        echo "The config file $CONFIGFILE is not found"
+        exit 1
+fi
+
+if [ -z $ACCOUNTID ]; then
+        read -p 'Account ID: ' ACCOUNTID
+fi
+if [ -z $USERNAME ]; then
+        read -p 'Username: ' USERNAME
+fi
+if [ -z $PASSWORD ]; then
+        read -sp 'Password: ' PASSWORD
+	echo
+fi
+
+curl -i -s -k -X $'POST' \
+    -m 5 \
+    -H @http_header.txt \
+    -H 'Accept: application/json, text/plain, */*' \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    -H 'Referer: https://us-east-1.signin.aws.amazon.com/oauth?SignatureVersion=4' \
+    --data-binary "action=iam-user-authentication&account=${ACCOUNTID}&username=${USERNAME}&password=${PASSWORD}&redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fdeepracer%2Fhome%3Fregion%3Dus-east-1%26state%3DhashArgs%2523leaderboard%26isauthcode%3Dtrue&client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fsilverstone" \
+    'https://us-east-1.signin.aws.amazon.com/authenticate'  > .curl.result
+
+if [ $? != 0 ]; then
+	echo "Can't authenticate"
+	return 1
+fi
+STATE=$(grep state .curl.result | jq '.state' | awk '{gsub("\"", "", $1); print $1}')
+if [ $STATE != 'SUCCESS' ]; then
+    echo "Failed to authenticate"
+    return 1
+fi
+
+USERINFO=$(grep userInfo .curl.result |awk -F'[=;]' '{print $2}')
+REDIRECTURL=$(grep SUCCESS .curl.result | jq '.properties.redirectUrl' | awk  '{print substr($1, 2, length($1)-2)}')
+
+curl -i -s -k -X $'GET' \
+    -H @http_header.txt \
+    -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+    -H 'Referer: https://us-east-1.signin.aws.amazon.com/oauth?SignatureVersion=4' \
+    -H "Cookie: aws-userInfo=${USERINFO}" \
+    -b "aws-userInfo=${USERINFO}" \
+    "$REDIRECTURL" > .curl.result
+
+USERCREDS=$(grep 'aws-creds' .curl.result | awk -F'[;=]' '{print $2}')
+
+curl -i -s -k -X $'GET' \
+    --compressed \
+    -H @http_header.txt \
+    -H $'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+    -H $"Cookie: aws-userInfo=${USERINFO}; aws-creds=${USERCREDS}" \
+    -b $"aws-userInfo=${USERINFO}; aws-creds=${USERCREDS}" \
+    $'https://console.aws.amazon.com/deepracer/home?region=us-east-1' > .curl.result
+
+X_CSRF_TOKEN=$(grep awsc-csrf-token .curl.result |awk -F'[=>]' '{gsub(/"/, "", $3); print $3}')
+AWS_COOKIE="aws-userInfo=$USERINFO; aws-creds=$USERCREDS"
+
+export X_CSRF_TOKEN
+export AWS_COOKIE
+
+rm -f .curl.result

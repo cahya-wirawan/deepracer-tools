@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+    echo "Usage: $0 <Model Name> <Directory Destination>"
+    echo "<Model Name> is mandatory" 
+    echo "<Directory Destination> is optional" 
+    exit 1
+fi
+if [ -z $2 ]; then
+    DESTDIR="."
+else
+    DESTDIR="$2"
+fi
+
+MODELNAME=$1
+CONFIGFILE="aws-deepracer.cf"
+
+if [ -f $CONFIGFILE ]; then
+        ACCOUNTID=$(grep -i ACCOUNTID $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+else
+        echo "The config file $CONFIGFILE is not found"
+        exit 1
+fi
+
+DATA='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetModel"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"ModelArn\":\"arn:aws:deepracer:us-east-1:'
+DATA+=$ACCOUNTID
+DATA+=':model/reinforcement_learning/'
+DATA+=$MODELNAME
+DATA+='\"}","operation":"getModel"}'
+export DATA
+
+./aws-execCurl > .curl.result
+
+DRMODEL=$(jq '.Model.ModelArtifactS3Location' .curl.result | awk '{gsub("\"", "", $1); print $1}') 
+rm -f .curl.result
+
+if [ $DRMODEL != 'null' ]; then
+    aws s3 cp "$DRMODEL" "$DESTDIR"
+else
+    echo "$MODELNAME is not found"
+    exit 1
+fi
+

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DATA='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.ListLeaderboards"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"MaxResults\":100}","operation":"listLeaderboards"}'
+export DATA
+
+./aws-execCurl | jq '.'

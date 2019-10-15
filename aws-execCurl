@@ -1,0 +1,12 @@
+#!/bin/bash
+
+curl 'https://console.aws.amazon.com/deepracer/api/awssilverstonecloudservice' \
+    -H 'Origin: https://console.aws.amazon.com' \
+    -H 'Referer: https://console.aws.amazon.com/deepracer/home?region=us-east-1' \
+    -H 'Content-Type: application/json' \
+    -H "X-CSRF-TOKEN: ${X_CSRF_TOKEN}" \
+    -H "Cookie: ${AWS_COOKIE}" \
+    -H @http_header.txt \
+    --data-binary "$DATA" \
+    --compressed -sS
+
