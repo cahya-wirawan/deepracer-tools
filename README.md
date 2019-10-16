@@ -39,7 +39,8 @@ The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmi
     environment variables for further usage, so you don't need to  authenticate for every scripts you run next time 
     until they are expire. The tokens will be valid for around 6 hours, after expired, you need to reauthenticate again 
     using the script above. 
- 6. Run the Auto Submission script and wait for email notification :-)
+ 6. Run the Auto Submission script and wait for email notification :-) It assumes that you have already uploaded your 
+    model trained locally or the model has been trained in the AWS cloud. 
     ```
     $ ./aws-submitModel "Your deepracer model name"
     ``` 
@@ -181,3 +182,9 @@ the complete list of the scripts:
 8. aws-execCurl
 
    The script is only used inside other scripts, should not run directly.
+   
+### TODO List
+* Gradually increase the speed in action space and resubmit until the model doesn't get any laps time improvement. 
+This approach could get the best out of the model without retraining it.
+* Re-authenticate automatically after the tokens expire
+* Upload automatically the latest model from local training before submission.
