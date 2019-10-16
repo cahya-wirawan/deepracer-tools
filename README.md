@@ -1,5 +1,5 @@
-# deepracer-tools
-Some tools for AWS deepracer
+# DeepRacer Tools
+Some tools for AWS DeepRacer
 
 ## Auto Submission
 
