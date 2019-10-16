@@ -50,7 +50,10 @@ the complete list of the scripts:
 1. aws-authenticate
 
    This is the first script to be executed before you can use other scripts. 
-   Run it as follow: `$ source ./aws-authenticate`. 
+   Run it as follow: 
+   ```
+   $ source ./aws-authenticate
+   ``` 
 2. aws-createLeaderboardSubmission
 
    This script submit a model. An example to run it and its output if you have submitted a model in the last 30 minutes:
