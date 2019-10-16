@@ -31,6 +31,11 @@ export DATA
 
 ./aws-execCurl > .curl.result
 
+errorMessage=$(jq '.error[0]' .curl.result)
+if [ "$errorMessage" != 'null' ]; then
+  echo "$errorMessage"
+  exit 1
+fi
 DRMODEL=$(jq '.Model.ModelArtifactS3Location' .curl.result | awk '{gsub("\"", "", $1); print $1}') 
 rm -f .curl.result
 
