@@ -44,3 +44,134 @@ The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmi
     $ ./aws-submitModel "Your deepracer model name"
     ``` 
  
+### List of the tools
+The tool has not only the main script to auto resubmit the model, but include also some other scripts. Following is 
+the complete list of the scripts:
+1. aws-authenticate
+
+   This is the first script to be executed before you can use other scripts. 
+   Run it as follow: `$ source ./aws-authenticate`. 
+2. aws-createLeaderboardSubmission
+
+   This script submit a model. An example to run it and its output if you have submitted a model in the last 30 minutes:
+   ```
+   $ ./aws-createLeaderboardSubmission DR-Local
+   {
+     "__type": "TooManyRequestsException",
+     "Message": "You have exceeded the number leaderboard submission requests allowed on your account."
+   }
+   ```
+3. aws-getLatestUserSubmission
+   ```
+   $ ./aws-getLatestUserSubmission
+   {
+     "LeaderboardSubmission": {
+       "Alias": "DodolGarut",
+       "AvgLapTime": 0,
+       "JobName": "sim-9jk8hj5zmjlm",
+       "LapCount": 0,
+       "LeaderboardSubmissionStatusType": "RUNNING",
+       "ModelArn": "arn:aws:deepracer:us-east-1:123456789012:model/reinforcement_learning/DR-Local",
+       "SubmissionTime": 1571232665626
+     }
+   }
+   ```
+4. aws-getRankedUserSubmission
+   ```
+   $ ./aws-getRankedUserSubmission
+   {
+     "LeaderboardSubmission": {
+       "Alias": "DodolGarut",
+       "AvgLapTime": 10254,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "ModelArn": "arn:aws:deepracer:us-east-1:123456789012:model/reinforcement_learning/DR-Local",
+       "Rank": 50,
+       "SubmissionTime": 1571226412408
+     }
+   }
+   ```
+5. aws-listLeaderboardSubmissions
+   ```
+   {
+     "LeaderboardSubmissions": [
+       {
+         "Alias": "Karl-NAB",
+         "AvgLapTime": 7555,
+         "LeaderboardSubmissionStatusType": "SUCCESS",
+         "Rank": 1,
+         "SubmissionTime": 1571051009345
+       },
+       {
+         "Alias": "JJ",
+         "AvgLapTime": 7745,
+         "LeaderboardSubmissionStatusType": "SUCCESS",
+         "Rank": 2,
+         "SubmissionTime": 1571195290542
+       },
+       {
+         "Alias": "D4D-test",
+         "AvgLapTime": 8305,
+         "LeaderboardSubmissionStatusType": "SUCCESS",
+         "Rank": 3,
+         "SubmissionTime": 1571128249473
+       },
+       ....
+       {
+         "Alias": "Shendy",
+         "AvgLapTime": 11476,
+         "LeaderboardSubmissionStatusType": "SUCCESS",
+         "Rank": 99,
+         "SubmissionTime": 1570583780470
+       },
+       {
+         "Alias": "PolishThunder",
+         "AvgLapTime": 11506,
+         "LeaderboardSubmissionStatusType": "SUCCESS",
+         "Rank": 100,
+         "SubmissionTime": 1571107235595
+       }
+     ],
+     "NextToken": "XYZ..."
+   } 
+   ```
+6. aws-listLeaderboards
+   ```
+   {
+     "Leaderboards": [
+       {
+         "Arn": "arn:aws:deepracer:us-east-1::leaderboard/season-2019-08",
+         "CloseTime": 1567295999000,
+         "Description": "The August race is now open and is the fourth stop on the Virtual Circuit World Tour. Create and train a model to master the Shanghai Sudu track and submit your model for a chance to win an all-expenses paid trip to Las Vegas, NV, to compete for the Championship Cup at re:Invent 2019!",
+         "ImageUrl": "https://deepracer-managed-resources-us-east-1.s3.amazonaws.com/leaderboard-resources/china_leaderboard.svg",
+         "LaunchTime": 1564642800000,
+         "MinimumLaps": 1,
+         "Name": "Shanghai Sudu",
+         "ParticipantCount": 1375,
+         "Status": "CLOSED",
+         "TrackArn": "arn:aws:deepracer:us-east-1::track/ChinaAlt_track",
+         "TrackImageUrl": "https://deepracer-managed-resources-us-east-1.s3.amazonaws.com/track-resources/chinaalt_track.svg"
+       },
+       {
+         "Arn": "arn:aws:deepracer:us-east-1::leaderboard/season-2019-06",
+         "CloseTime": 1561964399000,
+         "Description": "Continue racing and building up League points in the Kumo Torakku, the second stop in the Virtual Circuit World Tour. The race winner and season top point getters will win an expenses paid trip to compete for the Championship Cup at re:Invent 2019.",
+         "ImageUrl": "https://deepracer-managed-resources-us-east-1.s3.amazonaws.com/leaderboard-resources/japan_leaderboard.svg",
+         "LaunchTime": 1559595600000,
+         "MinimumLaps": 1,
+         "Name": "Kumo Torakku",
+         "ParticipantCount": 572,
+         "Status": "CLOSED",
+         "TrackArn": "arn:aws:deepracer:us-east-1::track/Tokyo_Racing_track",
+         "TrackImageUrl": "https://deepracer-managed-resources-us-east-1.s3.amazonaws.com/track-resources/tokyo_racing_track.svg"
+       },
+   ...
+   } 
+   ```
+
+7. aws-submitModel
+   ```
+   $ ./aws-submitModel DR-Local
+   {} 
+   ```
+8. aws-execCurl
+   The script is only used inside other scripts, should not run directly.
