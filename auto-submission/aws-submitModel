@@ -32,11 +32,19 @@ source ./aws-authenticate
 sleep $time
 while date;
 do
-  submissionStatus=$(./aws-createLeaderboardSubmission $MODELNAME | jq '.Message')
-  if [ "$submissionStatus" != 'null' ]
+  submissionReport=$(./aws-createLeaderboardSubmission $MODELNAME)
+  submissionLength=$(echo "$submissionReport" | jq 'length')
+  if [ "$submissionLength" != 0 ]
   then
-    echo $submissionStatus
-    echo "${submissionStatus}" | mailx -s "Deepracer Submission" $EMAIL
+    report=$(echo "$submissionReport" | jq '.Message')
+    if [ $"report" == "null" ]; then
+      report=$(echo "$submissionReport" | jq '.error[0]')
+      if [ $"report" == "null" ]; then
+        report="Unknown problem"
+      fi
+    fi
+    echo $report
+    echo "${report}" | mailx -s "Deepracer Submission" $EMAIL
     exit 1
   fi
   sleep 300
