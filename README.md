@@ -177,7 +177,20 @@ the complete list of the scripts:
 7. aws-submitModel
    ```
    $ ./aws-submitModel DR-Local
-   {} 
+   ...
+   Mi Okt 16 13:48:15 CEST 2019
+   "RUNNING" 0
+   "RUNNING" 0
+   "RUNNING" 0
+   "SUCCESS" 10254
+   Mi Okt 16 14:21:45 CEST 2019
+   "RUNNING" 0
+   "RUNNING" 0
+   "RUNNING" 0
+   "RUNNING" 0
+   "FAILED" 0
+   ...
+ 
    ```
 8. aws-execCurl
 
