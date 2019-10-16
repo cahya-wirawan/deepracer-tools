@@ -29,12 +29,18 @@ The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmi
       PASSWORD=""
       EMAIL="my-username@example.com"
     ```
-    If the password is empty, the script will ask you for it.
+    If the password is empty, the script will ask you for it. The email address is used to inform you when the result of
+    the submission is arrive or if there is any issue with the submission.
  5. Login to the AWS
     ```
     $ source ./aws-authenticate
     ``` 
     This authentication process will save the authentication tokens (aws-userInfo and aws-creds) and CSRF token in your 
-    environment variables for further usage, so you don't need to  authenticate for every scripts you run next time. 
-    The tokens will be valid for around 6 hours, after expired, you need to reauthenticate again using the script 
-    above.
+    environment variables for further usage, so you don't need to  authenticate for every scripts you run next time 
+    until they are expire. The tokens will be valid for around 6 hours, after expired, you need to reauthenticate again 
+    using the script above. 
+ 6. Run the Auto Submission script and wait for email notification :-)
+    ```
+    $ ./aws-submitModel "Your deepracer model name"
+    ``` 
+ 
