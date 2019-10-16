@@ -95,6 +95,7 @@ the complete list of the scripts:
    ```
 5. aws-listLeaderboardSubmissions
    ```
+   $ ./aws-listLeaderboardSubmissions
    {
      "LeaderboardSubmissions": [
        {
@@ -139,6 +140,7 @@ the complete list of the scripts:
    ```
 6. aws-listLeaderboards
    ```
+   $ ./aws-listLeaderboards
    {
      "Leaderboards": [
        {
