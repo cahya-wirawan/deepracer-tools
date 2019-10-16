@@ -20,7 +20,7 @@ if [ -f $CONFIGFILE ]; then
         PASSWORD=$(grep -i PASSWORD $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
 else
         echo "The config file $CONFIGFILE is not found"
-        exit 1
+        return 1
 fi
 
 if [ -z $ACCOUNTID ]; then
