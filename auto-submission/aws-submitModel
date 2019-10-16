@@ -16,14 +16,14 @@ fi
 MODELNAME=$1
 CONFIGFILE="aws-deepracer.cf"
 
-if [ -f $CONFIGFILE ]; then
-        EMAIL=$(grep -i EMAIL $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
+if [ -f "$CONFIGFILE" ]; then
+        EMAIL=$(grep -i EMAIL "$CONFIGFILE" | awk -F= '{gsub(/"/, "", $2); print $2}')
 else
-        echo "The config file $CONFIGFILE is not found"
+        echo "The config file "$CONFIGFILE" is not found"
         exit 1
 fi
 
-if [ -z $EMAIL ]; then
+if [ -z "$EMAIL" ]; then
         read -p 'Email: ' EMAIL
 fi
 
@@ -32,32 +32,32 @@ source ./aws-authenticate
 sleep $time
 while date;
 do
-  submissionReport=$(./aws-createLeaderboardSubmission $MODELNAME)
+  submissionReport=$(./aws-createLeaderboardSubmission "$MODELNAME")
   submissionLength=$(echo "$submissionReport" | jq 'length')
   if [ "$submissionLength" != 0 ]
   then
     report=$(echo "$submissionReport" | jq '.Message')
-    if [ $"report" == "null" ]; then
+    if [ "$report" == "null" ]; then
       report=$(echo "$submissionReport" | jq '.error[0]')
-      if [ $"report" == "null" ]; then
+      if [ "$report" == "null" ]; then
         report="Unknown problem"
       fi
     fi
-    echo $report
-    echo "${report}" | mailx -s "Deepracer Submission" $EMAIL
+    echo "$report"
+    echo "$report" | mailx -s "Deepracer Submission" "$EMAIL"
     exit 1
   fi
   sleep 300
   latestStatus='"RUNNING"'
-  while [ $latestStatus == '"RUNNING"' ]
+  while [ "$latestStatus" == '"RUNNING"' ]
   do
     latestUserSubmission=$(./aws-getLatestUserSubmission)
-    latestStatus=$(echo $latestUserSubmission | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
-    lapTime=$(echo $latestUserSubmission | jq '.LeaderboardSubmission.AvgLapTime')
-    echo $latestStatus $lapTime
+    latestStatus=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
+    lapTime=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.AvgLapTime')
+    echo "$latestStatus $lapTime"
     sleep 10
   done
-  echo "${latestStatus}: ${lapTime}" | mailx -s "Deepracer Submission" $EMAIL
+  echo "$latestStatus: $lapTime" | mailx -s "Deepracer Submission" $EMAIL
   sleep 1600
 done
  
