@@ -178,23 +178,23 @@ the complete list of the scripts:
    ```
    $ ./aws-submitModel DR-Local
    ...
-   Mi Okt 16 13:48:15 CEST 2019
+   Mi Okt 16 13:15:05 CEST 2019
+   "RUNNING" 0
+   "RUNNING" 0
+   "RUNNING" 0
+   "SUCCESS" 10802
+   Mi Okt 16 14:48:15 CEST 2019
+   "RUNNING" 0
    "RUNNING" 0
    "RUNNING" 0
    "RUNNING" 0
    "SUCCESS" 10254
-   Mi Okt 16 14:21:45 CEST 2019
-   "RUNNING" 0
-   "RUNNING" 0
-   "RUNNING" 0
-   "RUNNING" 0
-   "FAILED" 0
    ...
  
    ```
 8. aws-getModel
 
-   The script is only used inside other scripts, should not run directly.
+   The script download a model from AWS as compressed tar file. It requires additional AWS cli.
    ```
    ./aws-getModel DR-Local
    Completed 16.0 MiB/20.5 MiB (3.6 MiB/s) with 1 file(s) remaining                                      
