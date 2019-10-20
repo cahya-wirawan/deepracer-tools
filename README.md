@@ -20,7 +20,8 @@ The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmi
     ```
     $ cd deepracer-tools/auto-submission
     ```
-4. Copy the configuration template, and update it with your AWS credential:
+4. Copy the configuration template, and update it with your AWS IAM 
+   credential:
     ```
     $ cp aws-deepracer.cf.sample aws-deepracer.cf
     $ cat aws-deepracer.cf
@@ -57,7 +58,7 @@ the complete list of the scripts:
    ``` 
 2. aws-createLeaderboardSubmission
 
-   This script submit a model. An example to run it and its output if you have submitted a model in the last 30 minutes:
+   The script submit a model. An example to run it and its output if you have submitted a model in the last 30 minutes:
    ```
    $ ./aws-createLeaderboardSubmission DR-Local
    {
@@ -66,6 +67,8 @@ the complete list of the scripts:
    }
    ```
 3. aws-getLatestUserSubmission
+   The script retrieves the status of the latest user submission. The status can RUNNING, FAILED or SUCCESS. 
+   It includes the average lap time in second if the status is success.
    ```
    $ ./aws-getLatestUserSubmission
    {
@@ -81,6 +84,7 @@ the complete list of the scripts:
    }
    ```
 4. aws-getRankedUserSubmission
+   The script retrieves the user ranking in the league in the current race or on a specific month.
    ```
    $ ./aws-getRankedUserSubmission
    {
@@ -91,6 +95,17 @@ the complete list of the scripts:
        "ModelArn": "arn:aws:deepracer:us-east-1:123456789012:model/reinforcement_learning/DR-Local",
        "Rank": 50,
        "SubmissionTime": 1571226412408
+     }
+   }   
+   $ ./aws-getRankedUserSubmission 2019-08
+   {
+     "LeaderboardSubmission": {
+       "Alias": "DodolGarut",
+       "AvgLapTime": 13256,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "ModelArn": "arn:aws:deepracer:us-east-1:123456789012:model/reinforcement_learning/DR-Local",
+       "Rank": 155,
+       "SubmissionTime": 1566847602947
      }
    }
    ```
