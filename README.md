@@ -3,11 +3,21 @@ Some tools for AWS DeepRacer
 
 ## Auto Submission
 
-AWS DeepRacer provides a virtual circuit where we can submit our model. The same model can get difference lap time for every submission, therefore people resubmit it several time to get the fastest possible lap time. There is currently no restriction how often we can submit our model, however we have to wait 30 minutes between submission. All of these submissions have been done using a web browser since there is currently no DeepRacer capability in AWS cli. Some people use Selenium web browser plugin to automate this task. 
+AWS DeepRacer provides a virtual circuit where we can submit our model. The same model can get difference lap time for 
+every submission, therefore people resubmit it several time to get the fastest possible lap time. There is currently 
+no restriction how often we can submit our model, however we have to wait 30 minutes between submission. All of these 
+submissions have been done using a web browser since there is currently no DeepRacer capability in AWS cli. Some 
+people use Selenium web browser plugin to automate this task. 
 
-The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmit automatically a DeepRacer model every 30 minutes using only command line interface. It consists of several shell scripts and requires only curl, a command line tool for data transfer, and jq, a lightweight command line JSON processor.
+The aim of this DeepRacer Auto Submission Tool is, as the title says, to resubmit automatically a DeepRacer model 
+every 30 minutes using only command line interface. It consists of several shell scripts and requires only curl, 
+a command line tool for data transfer, and jq, a lightweight command line JSON processor. This approach uses very 
+minimal resources (memory, cpu, network traffic) comparing to the solution with full blown web browser and its 
+plugin/macro. This auto submitter send only the necessary http requests to AWS without many other http requests 
+normally communicated between a browser and web server. The authentication process needs only 3 http requests to 
+get the necessary tokens (auth-userInfo, auth-creds and x-csrf-token).
 
-### How to use it
+### Usage
 1. First Install the requirements (curl is normally already installed on your machine):
     ```
     $ sudo apt install curl jq
