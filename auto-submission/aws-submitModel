@@ -49,15 +49,18 @@ do
   fi
   sleep 300
   latestStatus='"RUNNING"'
+  waitingCounter=0
   while [ "$latestStatus" == '"RUNNING"' ]
   do
     latestUserSubmission=$(./aws-getLatestUserSubmission)
     latestStatus=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
     lapTime=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.AvgLapTime')
     echo "$latestStatus $lapTime"
+    waitingCounter=$(( $waitingCounter + 1 ))
     sleep 10
   done
   echo "$latestStatus: $lapTime" | mailx -s "Deepracer Submission" $EMAIL
-  sleep 1600
+  waitingTime=$(( 30*60 - 300 - 10*$waitingCounter ))
+  sleep $waitingTime
 done
  
