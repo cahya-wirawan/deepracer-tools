@@ -18,6 +18,7 @@ CONFIGFILE="aws-deepracer.cf"
 
 if [ -f "$CONFIGFILE" ]; then
         EMAIL=$(grep -i EMAIL "$CONFIGFILE" | awk -F= '{gsub(/"/, "", $2); print $2}')
+	SUBMISSION_MAX=$(grep -i SUBMISSION_MAX $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
 else
         echo "The config file "$CONFIGFILE" is not found"
         exit 1
@@ -26,12 +27,17 @@ fi
 if [ -z "$EMAIL" ]; then
         read -p 'Email: ' EMAIL
 fi
-
-source ./aws-authenticate
+if [ -z "$SUBMISSION_MAX" ]; then
+	SUBMISSION_MAX=20
+fi
 
 sleep $time
-while date;
+submissionCounter=0
+waitingTime=0
+while [ $submissionCounter -lt $SUBMISSION_MAX ];
 do
+  sleep $waitingTime
+  date
   submissionReport=$(./aws-createLeaderboardSubmission "$MODELNAME")
   submissionLength=$(echo "$submissionReport" | jq 'length')
   if [ "$submissionLength" != 0 ]
@@ -39,7 +45,10 @@ do
     report=$(echo "$submissionReport" | jq '.Message')
     if [ "$report" == "null" ]; then
       report=$(echo "$submissionReport" | jq '.error[0]')
-      if [ "$report" == "null" ]; then
+      if [[ $report == *auth* ]]; then
+        source ./aws-authenticate
+	continue
+      elif [ "$report" == "null" ]; then
         report="Unknown problem"
       fi
     fi
@@ -47,17 +56,22 @@ do
     echo "$report" | mailx -s "Deepracer Submission" "$EMAIL"
     exit 1
   fi
+  submissionCounter=$((  $submissionCounter + 1 ))
   sleep 300
   latestStatus='"RUNNING"'
+  waitingCounter=0
   while [ "$latestStatus" == '"RUNNING"' ]
   do
     latestUserSubmission=$(./aws-getLatestUserSubmission)
     latestStatus=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
     lapTime=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.AvgLapTime')
     echo "$latestStatus $lapTime"
+    waitingCounter=$(( $waitingCounter + 1 ))
     sleep 10
   done
   echo "$latestStatus: $lapTime" | mailx -s "Deepracer Submission" $EMAIL
-  sleep 1600
+  waitingTime=$(( 30*60 - 300 - 10*$waitingCounter ))
 done
  
+echo "End of Submission"  | mailx -s "Deepracer Submission" $EMAIL 
+

@@ -2,3 +2,4 @@ ACCOUNTID="123456789012"
 USERNAME="my-username"
 PASSWORD=""
 EMAIL="my-username@example.com"
+SUBMISSION_MAX=30
