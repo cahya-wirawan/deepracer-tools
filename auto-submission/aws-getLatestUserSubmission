@@ -1,14 +1,34 @@
 #!/bin/bash
 
-if [ -z $1 ]; then
-    SEASON="season-$(date +%Y-%m)"
-else
-    SEASON="season-$1"
-fi
+SEASON="season-$(date +%Y-%m)"
+DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
 
-DATA='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
-DATA+=$SEASON
-DATA+='\"}","operation":"getLatestUserSubmission"}'
+while getopts "cs:" opt; do
+  case "$opt" in
+  c)
+    DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer::579906027743:leaderboard/'
+    ;;
+  s)
+    SEASONX=(${OPTARG//-/ })
+    if [ "${SEASONX[0]}" -eq "${SEASONX[0]}" ] 2>/dev/null
+    then
+      SEASON="season-$OPTARG"
+    else
+      SEASON="$OPTARG"
+    fi
+    ;;
+  \?)
+    echo "Usage: `basename $0` -s yyyy-mm -c"
+    echo "-c is optional for community race"
+    exit
+    ;;
+  esac
+done
+
+DATASEASON+=$SEASON
+
+DATA=$DATASEASON'\"}","operation":"getLatestUserSubmission"}'
+echo $DATA
 export DATA
 
 ./aws-execCurl | jq '.'
