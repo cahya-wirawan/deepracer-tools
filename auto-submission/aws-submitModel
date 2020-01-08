@@ -1,19 +1,49 @@
 #!/bin/bash
 
-if [ -z $1 ]; then
-    echo "Usage: $0 <Model Name> <Sleep Time>"
-    echo "<Model Name> is mandatory" 
-    echo "<Sleep Time> is the time before we start to submit. It is optional" 
-    exit 1
-fi
-if [ -z $2 ]
-then
-  time=0
-else
-  time=$2
+function usage {
+  echo "Usage: `basename $0` -m modelname -s [season-yyyy-mm|community race name] -t <sleep time in second> -c"
+  echo "-m <model name> is mandatory"
+  echo "-s [season-yyyy-mm|community race name] if it is not used, the race name is set to season-<current year>-<current-month>"
+  echo "-c is optional for community race"
+  echo "-t <sleep time in second> is optional"
+}
+
+TIME=0
+m_flag=0
+c_flag=0
+while getopts "m:cs:t:" opt; do
+  case "$opt" in
+  m)
+    MODELNAME="$OPTARG"
+    m_flag=1
+    ;;
+  c)
+    c_flag=1
+    ;;
+  s)
+    SEASONX=(${OPTARG//-/ })
+    if [ "${SEASONX[0]}" -eq "${SEASONX[0]}" ] 2>/dev/null
+    then
+      SEASON="season-$OPTARG"
+    else
+      SEASON="$OPTARG"
+    fi
+    ;;
+  t)
+    TIME="$OPTARG"
+    ;;
+  \?)
+    usage
+    exit
+    ;;
+  esac
+done
+
+if [ $m_flag -eq 0 ]; then
+  usage
+  exit
 fi
 
-MODELNAME=$1
 CONFIGFILE="aws-deepracer.cf"
 
 if [ -f "$CONFIGFILE" ]; then
@@ -31,14 +61,18 @@ if [ -z "$SUBMISSION_MAX" ]; then
 	SUBMISSION_MAX=20
 fi
 
-sleep $time
+sleep $TIME
 submissionCounter=0
 waitingTime=0
 while [ $submissionCounter -lt $SUBMISSION_MAX ];
 do
   sleep $waitingTime
   date
-  submissionReport=$(./aws-createLeaderboardSubmission "$MODELNAME")
+  if [ $c_flag -eq 0 ]; then
+    submissionReport=$(./aws-createLeaderboardSubmission -m "$MODELNAME" -s "$SEASON")
+  else
+    submissionReport=$(./aws-createLeaderboardSubmission -m "$MODELNAME" -s "$SEASON" -c)
+  fi
   submissionLength=$(echo "$submissionReport" | jq 'length')
   if [ "$submissionLength" != 0 ]
   then
