@@ -8,6 +8,7 @@ function usage {
   echo "-t <sleep time in second> is optional"
 }
 
+SEASON="season-$(date +%Y-%m)"
 TIME=0
 m_flag=0
 c_flag=0
@@ -96,7 +97,11 @@ do
   waitingCounter=0
   while [ "$latestStatus" == '"RUNNING"' ]
   do
-    latestUserSubmission=$(./aws-getLatestUserSubmission)
+    if [ $c_flag -eq 0 ]; then
+      latestUserSubmission=$(./aws-getLatestUserSubmission -s "$SEASON")
+    else
+      latestUserSubmission=$(./aws-getLatestUserSubmission -s "$SEASON" -c)
+    fi
     latestStatus=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.LeaderboardSubmissionStatusType')
     lapTime=$(echo "$latestUserSubmission" | jq '.LeaderboardSubmission.AvgLapTime')
     echo "$latestStatus $lapTime"
