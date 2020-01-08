@@ -53,7 +53,7 @@ get the necessary tokens (auth-userInfo, auth-creds and x-csrf-token).
  6. Run the Auto Submission script and wait for email notification :-) It assumes that you have already uploaded your 
     model trained locally or the model has been trained in the AWS cloud. 
     ```
-    $ ./aws-submitModel "Your deepracer model name"
+    $ ./aws-submitModel -m "Your deepracer model name"
     ``` 
  
 ### List of the tools
@@ -70,11 +70,19 @@ the complete list of the scripts:
 
    The script submit a model. An example to run it and its output if you have submitted a model in the last 30 minutes:
    ```
-   $ ./aws-createLeaderboardSubmission DR-Local
+   $ ./aws-createLeaderboardSubmission -m DR-Local
    {
      "__type": "TooManyRequestsException",
      "Message": "You have exceeded the number leaderboard submission requests allowed on your account."
    }
+   ```
+   Submit a model for a specific official deepracer race:
+   ```
+   $ ./aws-createLeaderboardSubmission -m DR-Local -s season-2020-02
+   ```
+   Submit a model for a specific community race :
+   ```
+   $ ./aws-createLeaderboardSubmission -m DR-Local -s AWSDeepRacerCommunityContest3 -c
    ```
 3. aws-getLatestUserSubmission
    The script retrieves the status of the latest user submission. The status can RUNNING, FAILED or SUCCESS. 
@@ -93,6 +101,10 @@ the complete list of the scripts:
      }
    }
    ```
+   Get the latest user submission on community race:
+   ```
+   $ ./aws-getLatestUserSubmission -s AWSDeepRacerCommunityContest3 -c
+   ``` 
 4. aws-getRankedUserSubmission
    The script retrieves the user ranking in the league in the current race or on a specific month.
    ```
@@ -107,7 +119,7 @@ the complete list of the scripts:
        "SubmissionTime": 1571226412408
      }
    }   
-   $ ./aws-getRankedUserSubmission 2019-08
+   $ ./aws-getRankedUserSubmission -s season-2019-08
    {
      "LeaderboardSubmission": {
        "Alias": "DodolGarut",
@@ -118,51 +130,79 @@ the complete list of the scripts:
        "SubmissionTime": 1566847602947
      }
    }
+   $ ./aws-getRankedUserSubmission -s AWSDeepRacerCommunityContest3 -c
+   {
+     "LeaderboardSubmission": {
+       "Alias": "DodolGarut",
+       "AvgLapTime": 33493,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "ModelArn": "arn:aws:deepracer:us-east-1:453551183132:model/reinforcement_learning/Avalon",
+       "Rank": 16,
+       "SubmissionTime": 1578323183740
+     }
+   }
+
    ```
 5. aws-listLeaderboardSubmissions
    ```
    $ ./aws-listLeaderboardSubmissions
-   {
-     "LeaderboardSubmissions": [
-       {
-         "Alias": "Karl-NAB",
-         "AvgLapTime": 7555,
-         "LeaderboardSubmissionStatusType": "SUCCESS",
-         "Rank": 1,
-         "SubmissionTime": 1571051009345
-       },
-       {
-         "Alias": "JJ",
-         "AvgLapTime": 7745,
-         "LeaderboardSubmissionStatusType": "SUCCESS",
-         "Rank": 2,
-         "SubmissionTime": 1571195290542
-       },
-       {
-         "Alias": "D4D-test",
-         "AvgLapTime": 8305,
-         "LeaderboardSubmissionStatusType": "SUCCESS",
-         "Rank": 3,
-         "SubmissionTime": 1571128249473
-       },
-       ....
-       {
-         "Alias": "Shendy",
-         "AvgLapTime": 11476,
-         "LeaderboardSubmissionStatusType": "SUCCESS",
-         "Rank": 99,
-         "SubmissionTime": 1570583780470
-       },
-       {
-         "Alias": "PolishThunder",
-         "AvgLapTime": 11506,
-         "LeaderboardSubmissionStatusType": "SUCCESS",
-         "Rank": 100,
-         "SubmissionTime": 1571107235595
-       }
-     ],
-     "NextToken": "XYZ..."
-   } 
+   [
+     {
+       "Alias": "Karl-NAB",
+       "AvgLapTime": 7555,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 1,
+       "SubmissionTime": 1571051009345
+     },
+     {
+       "Alias": "JJ",
+       "AvgLapTime": 7745,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 2,
+       "SubmissionTime": 1571195290542
+     },
+     {
+       "Alias": "D4D-test",
+       "AvgLapTime": 8305,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 3,
+       "SubmissionTime": 1571128249473
+     },
+     ....
+     {
+       "Alias": "Shendy",
+       "AvgLapTime": 11476,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 99,
+       "SubmissionTime": 1570583780470
+     },
+     {
+       "Alias": "PolishThunder",
+       "AvgLapTime": 11506,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 100,
+       "SubmissionTime": 1571107235595
+     }
+   ]
+   $ ./aws-listLeaderboardSubmissions -s AWSDeepRacerCommunityContest3 -c
+   [
+     {
+       "Alias": "JJ",
+       "AvgLapTime": 9197,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 1,
+       "SubmissionTime": 1578347651808
+     },
+     {
+       "Alias": "MattCamp",
+       "AvgLapTime": 10132,
+       "LeaderboardSubmissionStatusType": "SUCCESS",
+       "Rank": 2,
+       "SubmissionTime": 1578420291352
+     },
+   ...
+   ]
+
    ```
 6. aws-listLeaderboards
    ```
@@ -201,7 +241,7 @@ the complete list of the scripts:
 
 7. aws-submitModel
    ```
-   $ ./aws-submitModel DR-Local
+   $ ./aws-submitModel -m DR-Local
    ...
    Mi Okt 16 13:15:05 CEST 2019
    "RUNNING" 0
@@ -215,6 +255,7 @@ the complete list of the scripts:
    "RUNNING" 0
    "SUCCESS" 10254
    ...
+   $ ./aws-submitModel -m DR-Local -s AWSDeepRacerCommunityContest3 -c
  
    ```
 8. aws-getModel
