@@ -28,7 +28,6 @@ done
 DATASEASON+=$SEASON
 
 DATA=$DATASEASON'\"}","operation":"getLatestUserSubmission"}'
-echo $DATA
 export DATA
 
 ./aws-execCurl | jq '.'
