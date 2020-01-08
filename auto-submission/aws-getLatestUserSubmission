@@ -18,7 +18,7 @@ while getopts "cs:" opt; do
     fi
     ;;
   \?)
-    echo "Usage: `basename $0` -s yyyy-mm -c"
+    echo "Usage: `basename $0` -s [season-yyyy-mm|community race name] -c"
     echo "-c is optional for community race"
     exit
     ;;

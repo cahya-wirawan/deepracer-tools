@@ -21,7 +21,8 @@ while getopts "cs:u:" opt; do
   u)  DRUSER=$OPTARG
     ;;
   \?)
-    echo "Usage: `basename $0` -s yyyy-mm -u username"
+    echo "Usage: `basename $0` -s [season-yyyy-mm|community race name] -u username -c"
+    echo "-c is optional for community race"
     exit
     ;;
   esac

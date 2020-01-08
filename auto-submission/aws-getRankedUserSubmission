@@ -6,9 +6,34 @@ else
     SEASON="season-$1"
 fi
 
-DATA='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetRankedUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
-DATA+=$SEASON
-DATA+='\"}","operation":"getRankedUserSubmission"}'
+SEASON="season-$(date +%Y-%m)"
+DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetRankedUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
+
+while getopts "cs:" opt; do
+  case "$opt" in
+  c)
+    DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetRankedUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer::579906027743:leaderboard/'
+    ;;
+  s)
+    SEASONX=(${OPTARG//-/ })
+    if [ "${SEASONX[0]}" -eq "${SEASONX[0]}" ] 2>/dev/null
+    then
+      SEASON="season-$OPTARG"
+    else
+      SEASON="$OPTARG"
+    fi
+    ;;
+  \?)
+    echo "Usage: `basename $0` -s [season-yyyy-mm|community race name] -c"
+    echo "-c is optional for community race"
+    exit
+    ;;
+  esac
+done
+
+DATASEASON+=$SEASON
+
+DATA=$DATASEASON'\"}","operation":"getRankedUserSubmission"}'
 export DATA
 
 ./aws-execCurl | jq '.'
