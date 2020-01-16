@@ -85,6 +85,7 @@ the complete list of the scripts:
    $ ./aws-createLeaderboardSubmission -m DR-Local -s AWSDeepRacerCommunityContest3 -c
    ```
 3. aws-getLatestUserSubmission
+
    The script retrieves the status of the latest user submission. The status can RUNNING, FAILED or SUCCESS. 
    It includes the average lap time in second if the status is success.
    ```
@@ -106,6 +107,7 @@ the complete list of the scripts:
    $ ./aws-getLatestUserSubmission -s AWSDeepRacerCommunityContest3 -c
    ``` 
 4. aws-getRankedUserSubmission
+
    The script retrieves the user ranking in the league in the current race or on a specific month.
    ```
    $ ./aws-getRankedUserSubmission
@@ -239,6 +241,7 @@ the complete list of the scripts:
    } 
    ```
 7. aws-listSubscribedPrivateLeaderboards
+
    List all private leaderboards (community races) that the user has subscribed.
    ```
    $ ./aws-listSubscribedPrivateLeaderboards
