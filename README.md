@@ -136,7 +136,7 @@ the complete list of the scripts:
        "Alias": "DodolGarut",
        "AvgLapTime": 33493,
        "LeaderboardSubmissionStatusType": "SUCCESS",
-       "ModelArn": "arn:aws:deepracer:us-east-1:453551183132:model/reinforcement_learning/Avalon",
+       "ModelArn": "arn:aws:deepracer:us-east-1:123456789012:model/reinforcement_learning/Avalon",
        "Rank": 16,
        "SubmissionTime": 1578323183740
      }
@@ -238,8 +238,42 @@ the complete list of the scripts:
    ...
    } 
    ```
-
-7. aws-submitModel
+7. aws-listSubscribedPrivateLeaderboards
+   List all private leaderboards (community races) that the user has subscribed.
+   ```
+   $ ./aws-listSubscribedPrivateLeaderboards
+   {
+     "PrivateLeaderboards": [
+       {
+         "Arn": "arn:aws:deepracer::324010867108:leaderboard/AWS-DeepRacer-Innovate-Challenge",
+         "Description": "Official AWS Innovate AI/ML Edition AWS DeepRacer Challenge in Feb 2020.",
+         "EndTime": 1582934400000,
+         "LeaderboardImage": "LeaderboardImage6",
+         "MinimumLaps": 1,
+         "Name": "AWS-DeepRacer-Innovate-Challenge",
+         "ParticipantCount": 33,
+         "StartTime": 1577836800000,
+         "Status": "OPEN",
+         "TotalLaps": 3,
+         "TrackArn": "arn:aws:deepracer:us-east-1::track/reInvent2019_track"
+       },
+       {
+         "Arn": "arn:aws:deepracer::579906027743:leaderboard/AWSDeepRacerCommunityContest3",
+         "Description": "DeepRacer Community Contest #3! This is an endurance race where the aim is to complete 3/3 laps. Prizes of AWS credits for the top 10. To qualify, you must also register for the contest at https://contest.deepracing.io",
+         "EndTime": 1579305600000,
+         "LeaderboardImage": "LeaderboardImage5",
+         "MinimumLaps": 3,
+         "Name": "AWSDeepRacerCommunityContest3",
+         "ParticipantCount": 21,
+         "StartTime": 1578096000000,
+         "Status": "OPEN",
+         "TotalLaps": 3,
+         "TrackArn": "arn:aws:deepracer:us-east-1::track/Vegas_track"
+       }
+     ]
+   }
+   ```
+8. aws-submitModel
    ```
    $ ./aws-submitModel -m DR-Local
    ...
@@ -258,7 +292,7 @@ the complete list of the scripts:
    $ ./aws-submitModel -m DR-Local -s AWSDeepRacerCommunityContest3 -c
  
    ```
-8. aws-getModel
+9. aws-getModel
 
    The script download a model from AWS as compressed tar file. It requires additional AWS cli.
    ```
@@ -266,12 +300,12 @@ the complete list of the scripts:
    Completed 16.0 MiB/20.5 MiB (3.6 MiB/s) with 1 file(s) remaining                                      
    ```
    
-9. aws-execCurl
+10. aws-execCurl
 
    The script is only used inside other scripts, should not run directly.
    
 ### TODO List
 * Gradually increase the speed in action space and resubmit until the model doesn't get any laps time improvement. 
 This approach could get the best out of the model without retraining it.
-* Re-authenticate automatically after the tokens expire
+* ~~Re-authenticate automatically after the tokens expire~~
 * Upload automatically the latest model from local training before submission.
