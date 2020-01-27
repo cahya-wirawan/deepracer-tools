@@ -1,12 +1,20 @@
 #!/bin/bash
 
 SEASON="season-$(date +%Y-%m)"
-DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
+DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"'
+ARN="arn:aws:deepracer:us-east-1::leaderboard"
 
+function usage {
+  echo "Usage: `basename $0` -s [season-yyyy-mm|community race name] -c"
+  echo "-s if it is not used, the race name is set to season-<current year>-<current-month>"
+  echo "-c is optional for community race"
+}
+
+c_flag=0
 while getopts "cs:" opt; do
   case "$opt" in
   c)
-    DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.GetLatestUserSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer::579906027743:leaderboard/'
+    c_flag=1
     ;;
   s)
     SEASONX=(${OPTARG//-/ })
@@ -18,14 +26,24 @@ while getopts "cs:" opt; do
     fi
     ;;
   \?)
-    echo "Usage: `basename $0` -s [season-yyyy-mm|community race name] -c"
-    echo "-c is optional for community race"
+    usage
     exit
     ;;
   esac
 done
 
-DATASEASON+=$SEASON
+if [ $c_flag -eq 1 ]; then
+  ARN=$(./aws-listSubscribedPrivateLeaderboards |jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+else
+  ARN=$(./aws-listLeaderboards |jq '.Leaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+fi
+
+if [ -z "$ARN" ]; then
+  echo "$SEASON doesn't exist"
+  exit
+fi
+
+DATASEASON="$DATASEASON$ARN"
 
 DATA=$DATASEASON'\"}","operation":"getLatestUserSubmission"}'
 export DATA
