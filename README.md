@@ -308,6 +308,7 @@ the complete list of the scripts:
    The script is only used inside other scripts, should not run directly.
    
 ### TODO List
+* Code Refactoring and move from shell script to Python.
 * Gradually increase the speed in action space and resubmit until the model doesn't get any laps time improvement. 
 This approach could get the best out of the model without retraining it.
 * ~~Re-authenticate automatically after the tokens expire~~
