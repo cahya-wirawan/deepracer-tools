@@ -18,9 +18,10 @@ else
 fi
 
 SEASON="season-$(date +%Y-%m)"
-DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.CreateLeaderboardSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer:us-east-1::leaderboard/'
+DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.CreateLeaderboardSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"'
 
 m_flag=0
+c_flag=0
 while getopts "m:cs:" opt; do
   case "$opt" in
   m)
@@ -28,7 +29,7 @@ while getopts "m:cs:" opt; do
     m_flag=1
     ;;
   c)
-    DATASEASON='{"headers":{"X-Amz-User-Agent":"aws-sdk-js/2.324.0 promise","Content-Type":"application/x-amz-json-1.1","X-Amz-Target":"AwsSilverstoneCloudService.CreateLeaderboardSubmission"},"path":"/","method":"POST","region":"us-east-1","params":{},"contentString":"{\"LeaderboardArn\":\"arn:aws:deepracer::579906027743:leaderboard/'
+    c_flag=1
     ;;
   s)
     SEASONX=(${OPTARG//-/ })
@@ -51,7 +52,18 @@ if [ $m_flag -eq 0 ]; then
   exit
 fi
 
-DATASEASON+=$SEASON
+if [ $c_flag -eq 1 ]; then
+  ARN=$(./aws-listSubscribedPrivateLeaderboards |jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+else
+  ARN=$(./aws-listLeaderboards |jq '.Leaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+fi
+
+if [ -z "$ARN" ]; then
+  echo '{ "error": [ "'$SEASON' does not exist" ] }'
+  exit 1
+fi
+
+DATASEASON="$DATASEASON$ARN"
 DATA=$DATASEASON'\",\"ModelArn\":\"arn:aws:deepracer:us-east-1:'
 DATA+=$ACCOUNTID
 DATA+=':model/reinforcement_learning/'
