@@ -51,7 +51,7 @@ fi
 
 if [ -z "$ARN" ]; then
   echo '{ "error": [ "'$SEASON' does not exist" ] }'
-  exit
+  exit 1
 fi
 
 DATASEASON="$DATASEASON$ARN"

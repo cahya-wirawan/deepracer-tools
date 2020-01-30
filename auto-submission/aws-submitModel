@@ -48,15 +48,15 @@ fi
 CONFIGFILE="aws-deepracer.cf"
 
 if [ -f "$CONFIGFILE" ]; then
-        EMAIL=$(grep -i EMAIL "$CONFIGFILE" | awk -F= '{gsub(/"/, "", $2); print $2}')
+  EMAIL=$(grep -i EMAIL "$CONFIGFILE" | awk -F= '{gsub(/"/, "", $2); print $2}')
 	SUBMISSION_MAX=$(grep -i SUBMISSION_MAX $CONFIGFILE | awk -F= '{gsub(/"/, "", $2); print $2}')
 else
-        echo "The config file "$CONFIGFILE" is not found"
-        exit 1
+  echo "The config file "$CONFIGFILE" is not found"
+  exit 1
 fi
 
 if [ -z "$EMAIL" ]; then
-        read -p 'Email: ' EMAIL
+  read -p 'Email: ' EMAIL
 fi
 if [ -z "$SUBMISSION_MAX" ]; then
 	SUBMISSION_MAX=20
@@ -82,7 +82,7 @@ do
       report=$(echo "$submissionReport" | jq '.error[0]')
       if [[ $report == *auth* ]]; then
         source ./aws-authenticate
-	continue
+	      continue
       elif [ "$report" == "null" ]; then
         report="Unknown problem"
       fi

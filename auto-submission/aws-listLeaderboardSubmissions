@@ -35,9 +35,21 @@ while getopts "cs:u:" opt; do
 done
 
 if [ $c_flag -eq 1 ]; then
-  ARN=$(./aws-listSubscribedPrivateLeaderboards |jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+  LEADERBOARDS=$(./aws-listSubscribedPrivateLeaderboards)
+  echo $LEADERBOARDS | jq '.error[0]' | grep authenticate > /dev/null
+  if [ $? == 0 ]; then
+    echo $LEADERBOARDS
+    exit 1
+  fi
+  ARN=$(echo $LEADERBOARDS | jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
 else
-  ARN=$(./aws-listLeaderboards |jq '.Leaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+  LEADERBOARDS=$(./aws-listLeaderboards)
+  echo $LEADERBOARDS | jq '.error[0]' | grep authenticate > /dev/null
+  if [ $? == 0 ]; then
+    echo $LEADERBOARDS
+    exit 1
+  fi
+  ARN=$(echo $LEADERBOARDS | jq '.Leaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
 fi
 
 if [ -z "$ARN" ]; then
@@ -46,7 +58,6 @@ if [ -z "$ARN" ]; then
 fi
 
 DATASEASON="$DATASEASON$ARN"
-
 DATA=$DATASEASON'\",\"MaxResults\":100}","operation":"listLeaderboardSubmissions"}'
 export DATA
 
