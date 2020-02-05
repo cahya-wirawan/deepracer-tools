@@ -3,7 +3,7 @@ import rospy
 from std_msgs.msg import String
 from time import time
 
-ROS_RATE = 10
+ROS_RATE = 10   # 10hz
 TIME_DIFF = 1.0/ROS_RATE
 
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(ROS_RATE)  # 10hz
+    rate = rospy.Rate(ROS_RATE)
     last_time = time() - TIME_DIFF
 
     for event in dev.read_loop():
