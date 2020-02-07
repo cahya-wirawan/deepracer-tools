@@ -7,6 +7,7 @@ from time import time
 ROS_RATE = 10   # 10hz
 TIME_DIFF = 1.0/ROS_RATE
 THROTTLE_MAX = 0.7
+SQRT2 = math.sqrt(2.0)
 
 
 def scale(val, src, dst):
@@ -38,12 +39,12 @@ if __name__ == '__main__':
                 continue
             if event.code == 0:  # X axis
                 if throttle != 0.0:
-                    angle = scale_stick(event.value)
-                    angle = - math.asin(angle/throttle)
+                    x_axis = scale_stick(event.value)
+                    angle = - math.asin(max(1.0, x_axis/throttle))
             if event.code == 1:  # Y axis
-                throttle = scale_stick(event.value)
-                throttle = THROTTLE_MAX * math.sqrt(throttle*throttle + angle*angle)
-                throttle = - math.copysign(throttle, event.value)
+                y_axis = scale_stick(event.value)
+                throttle = THROTTLE_MAX * math.sqrt(y_axis*y_axis + angle*angle)/SQRT2
+                throttle = - math.copysign(throttle, y_axis)
             try:
                 if not rospy.is_shutdown():
                     msg.angle = angle
