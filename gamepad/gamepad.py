@@ -42,7 +42,7 @@ if __name__ == '__main__':
                     angle = - math.asin(angle/throttle)
             if event.code == 1:  # Y axis
                 throttle = scale_stick(event.value)
-                throttle = - THROTTLE_MAX * math.sqrt(throttle*throttle + angle*angle)
+                throttle = - math.copysign(1, event.value) * THROTTLE_MAX * math.sqrt(throttle*throttle + angle*angle)
             try:
                 if not rospy.is_shutdown():
                     msg.angle = angle
