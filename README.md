@@ -2,6 +2,7 @@
 Some tools for AWS DeepRacer
 
 ## Auto Submission
+[An automated resubmission](auto-submission) of a DeepRacer model every 30 minutes.
 
 AWS DeepRacer provides a virtual circuit where we can submit our model. The 
 same model can get different lap time for every submission, therefore 
@@ -320,3 +321,7 @@ the complete list of the scripts:
 This approach could get the best out of the model without retraining it.
 * ~~Re-authenticate automatically after the tokens expire~~
 * Upload automatically the latest model from local training before submission.
+
+
+## Gamepad
+Driving the DeepRacer using PS4 [Gamepad](gamepad)
