@@ -24,6 +24,7 @@ if __name__ == '__main__':
     gamepad = evdev.InputDevice(devices[0].fn)
     print(gamepad)
 
+    rospy.init_node('gamepad_node', disable_signals=True)
     pub_manual_drive = rospy.Publisher('manual_drive', ServoCtrlMsg, queue_size=10)
     msg = ServoCtrlMsg()
     # rospy.init_node('talker', anonymous=True)
@@ -36,9 +37,9 @@ if __name__ == '__main__':
         # print(categorize(event))
         if event.type == 3:      # Analog stick
             if event.code == 0:  # X axis
-                angle = scale(event.value)
+                angle = - scale_stick(event.value)
             if event.code == 1:  # Y axis
-                throttle = THROTTLE_MAX * scale(event.value)
+                throttle = - THROTTLE_MAX * scale_stick(event.value)
             now = time()
             if now - last_time < TIME_DIFF:
                 continue
