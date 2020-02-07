@@ -1,7 +1,6 @@
-from evdev import InputDevice, categorize, ecodes
+import math
 import evdev
 import rospy
-from std_msgs.msg import String
 from ctrl_pkg.msg import ServoCtrlMsg
 from time import time
 
@@ -19,41 +18,38 @@ def scale_stick(value):
 
 
 if __name__ == '__main__':
-
-    devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
-    gamepad = evdev.InputDevice(devices[0].fn)
-    print(gamepad)
-
     rospy.init_node('gamepad_node', disable_signals=True)
     pub_manual_drive = rospy.Publisher('manual_drive', ServoCtrlMsg, queue_size=10)
     msg = ServoCtrlMsg()
-    # rospy.init_node('talker', anonymous=True)
     # rate = rospy.Rate(ROS_RATE)
+    devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
+    gamepad = evdev.InputDevice(devices[0].fn)
+    rospy.loginfo(gamepad)
+
     last_time = time() - TIME_DIFF
-    angle = 0
-    throttle = 0
+    angle = 0.0
+    throttle = 0.0
 
     for event in gamepad.read_loop():
-        # print(categorize(event))
+        # print(evdev.categorize(event))
         if event.type == 3:      # Analog stick
-            if event.code == 0:  # X axis
-                angle = - scale_stick(event.value)
-            if event.code == 1:  # Y axis
-                throttle = - THROTTLE_MAX * scale_stick(event.value)
             now = time()
             if now - last_time < TIME_DIFF:
                 continue
+            if event.code == 0:  # X axis
+                if throttle != 0.0:
+                    angle = scale_stick(event.value)
+                    angle = - math.asin(angle/throttle)
+            if event.code == 1:  # Y axis
+                throttle = scale_stick(event.value)
+                throttle = - THROTTLE_MAX * math.sqrt(throttle*throttle + angle*angle)
             try:
                 if not rospy.is_shutdown():
-                    # movement = "angle: %f, throttle: %f".format(angle, throttle)
-                    # print(movement)
                     msg.angle = angle
                     msg.throttle = throttle
                     pub_manual_drive.publish(msg)
                     rospy.loginfo(msg)
-                    last_time = time()
+                    last_time = now
             except rospy.ROSInterruptException:
                 print("ROS exit")
                 exit(0)
-
-
