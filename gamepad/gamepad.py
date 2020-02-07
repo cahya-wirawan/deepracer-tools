@@ -40,10 +40,10 @@ if __name__ == '__main__':
             if event.code == 0:  # X axis
                 if throttle != 0.0:
                     x_axis = scale_stick(event.value)
-                    angle = - math.asin(max(1.0, x_axis/throttle))
+                    angle = - 2.0 / math.pi * math.asin(max(1.0, x_axis/throttle))
             if event.code == 1:  # Y axis
                 y_axis = scale_stick(event.value)
-                throttle = THROTTLE_MAX * math.sqrt(y_axis*y_axis + angle*angle)/SQRT2
+                throttle = THROTTLE_MAX * math.sqrt(y_axis*y_axis + angle*angle) / SQRT2
                 throttle = - math.copysign(throttle, y_axis)
             try:
                 if not rospy.is_shutdown():
