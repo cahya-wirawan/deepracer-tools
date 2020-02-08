@@ -54,11 +54,11 @@ if __name__ == '__main__':
                         y_axis = scale_stick(event.value)
                         throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
                         throttle = - math.copysign(throttle, y_axis)
+                    if not start_stop_state and abs(angle) >= 0.0 and abs(throttle) >= 0.0:
+                        start_stop_state = True
+                        enable_state_req(start_stop_state)
+                        rospy.loginfo("###### START")
                     if event.code == 0 or event.code == 1:
-                        if not start_stop_state and angle > 0.1 and throttle > 0.1:
-                            start_stop_state = True
-                            enable_state_req(start_stop_state)
-                            rospy.loginfo("###### START")
                         if start_stop_state:
                             try:
                                 if not rospy.is_shutdown():
@@ -71,6 +71,7 @@ if __name__ == '__main__':
                                 print("ROS exit")
                                 exit(0)
         else:
+            rospy.loginfo("###### WILL STOP")
             if start_stop_state:
                 start_stop_state = False
                 enable_state_req(start_stop_state)
