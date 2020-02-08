@@ -45,9 +45,6 @@ if __name__ == '__main__':
             for event in gamepad.read():
                 now = time()
                 if event.type == 3 and (event.code == 0 or event.code == 1):      # Analog stick
-                    if not start_stop_state:
-                        start_stop_state = True
-                        enable_state_req(start_stop_state)
                     if now - last_time < TIME_DIFF:
                         continue
                     if event.code == 0:  # X axis
@@ -58,17 +55,23 @@ if __name__ == '__main__':
                         throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
                         throttle = - math.copysign(throttle, y_axis)
                     if event.code == 0 or event.code == 1:
-                        try:
-                            if not rospy.is_shutdown():
-                                msg.angle = angle
-                                msg.throttle = THROTTLE_MAX * throttle
-                                pub_manual_drive.publish(msg)
-                                rospy.loginfo(msg)
-                                last_time = now
-                        except rospy.ROSInterruptException:
-                            print("ROS exit")
-                            exit(0)
+                        if not start_stop_state and angle > 0.1 and throttle > 0.1:
+                            start_stop_state = True
+                            enable_state_req(start_stop_state)
+                            rospy.loginfo("###### START")
+                        if start_stop_state:
+                            try:
+                                if not rospy.is_shutdown():
+                                    msg.angle = angle
+                                    msg.throttle = THROTTLE_MAX * throttle
+                                    pub_manual_drive.publish(msg)
+                                    rospy.loginfo(msg)
+                                    last_time = now
+                            except rospy.ROSInterruptException:
+                                print("ROS exit")
+                                exit(0)
         else:
             if start_stop_state:
                 start_stop_state = False
                 enable_state_req(start_stop_state)
+                rospy.loginfo("###### STOP")
