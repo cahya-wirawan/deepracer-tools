@@ -4,9 +4,9 @@ import rospy
 from ctrl_pkg.msg import ServoCtrlMsg
 from time import time
 
-ROS_RATE = 10   # 10hz
+ROS_RATE = 20   # 10hz
 TIME_DIFF = 1.0/ROS_RATE
-THROTTLE_MAX = 0.7
+THROTTLE_MAX =  0.6
 SQRT2 = math.sqrt(2.0)
 
 
@@ -30,6 +30,8 @@ if __name__ == '__main__':
     last_time = time() - TIME_DIFF
     angle = 0.0
     throttle = 0.0
+    x_axis = 0.0
+    y_axis = 0.0
 
     for event in gamepad.read_loop():
         # print(evdev.categorize(event))
@@ -38,17 +40,16 @@ if __name__ == '__main__':
             if now - last_time < TIME_DIFF:
                 continue
             if event.code == 0:  # X axis
-                if throttle != 0.0:
-                    x_axis = scale_stick(event.value)
-                    angle = - 2.0 / math.pi * math.asin(max(1.0, x_axis/throttle))
+                x_axis = scale_stick(event.value)
+                angle = - x_axis
             if event.code == 1:  # Y axis
                 y_axis = scale_stick(event.value)
-                throttle = THROTTLE_MAX * math.sqrt(y_axis*y_axis + angle*angle) / SQRT2
+                throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
                 throttle = - math.copysign(throttle, y_axis)
             try:
                 if not rospy.is_shutdown():
                     msg.angle = angle
-                    msg.throttle = throttle
+                    msg.throttle = THROTTLE_MAX * throttle
                     pub_manual_drive.publish(msg)
                     rospy.loginfo(msg)
                     last_time = now
