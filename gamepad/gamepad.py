@@ -1,5 +1,6 @@
 from time import time
 import math
+from select import select
 import evdev
 import rospy
 from ctrl_pkg.msg import ServoCtrlMsg
@@ -37,33 +38,37 @@ if __name__ == '__main__':
     y_axis = 0.0
     start_stop_state = False
 
-    for event in gamepad.read_loop():
+    while True:
         # print(evdev.categorize(event))
-        now = time()
-        if now - last_time > TIME_TO_STOP and start_stop_state:
-            start_stop_state = False
-            enable_state_req(start_stop_state)
-        if event.type == 3:      # Analog stick
-            if not start_stop_state:
-                start_stop_state = True
+        r, w, x = select([gamepad.fd], [], [], timeout=1.0)
+        if r:
+            for event in gamepad.read():
+                now = time()
+                if event.type == 3:      # Analog stick
+                    if not start_stop_state:
+                        start_stop_state = True
+                        enable_state_req(start_stop_state)
+                    if now - last_time < TIME_DIFF:
+                        continue
+                    if event.code == 0:  # X axis
+                        x_axis = scale_stick(event.value)
+                        angle = - x_axis
+                    if event.code == 1:  # Y axis
+                        y_axis = scale_stick(event.value)
+                        throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
+                        throttle = - math.copysign(throttle, y_axis)
+                    if event.code == 0 or event.code == 1:
+                        try:
+                            if not rospy.is_shutdown():
+                                msg.angle = angle
+                                msg.throttle = THROTTLE_MAX * throttle
+                                pub_manual_drive.publish(msg)
+                                rospy.loginfo(msg)
+                                last_time = now
+                        except rospy.ROSInterruptException:
+                            print("ROS exit")
+                            exit(0)
+        else:
+            if start_stop_state:
+                start_stop_state = False
                 enable_state_req(start_stop_state)
-            if now - last_time < TIME_DIFF:
-                continue
-            if event.code == 0:  # X axis
-                x_axis = scale_stick(event.value)
-                angle = - x_axis
-            if event.code == 1:  # Y axis
-                y_axis = scale_stick(event.value)
-                throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
-                throttle = - math.copysign(throttle, y_axis)
-            if event.code == 0 or event.code == 1:
-                try:
-                    if not rospy.is_shutdown():
-                        msg.angle = angle
-                        msg.throttle = THROTTLE_MAX * throttle
-                        pub_manual_drive.publish(msg)
-                        rospy.loginfo(msg)
-                        last_time = now
-                except rospy.ROSInterruptException:
-                    print("ROS exit")
-                    exit(0)
