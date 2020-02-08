@@ -10,7 +10,7 @@ from ctrl_pkg.srv import (ActiveStateSrv,
 
 ROS_RATE = 20   # 20hz
 TIME_DIFF = 1.0/ROS_RATE
-TIME_TO_STOP = 3 # 3 seconds to stop the motor
+TIME_TO_STOP = 1.0  # 1 seconds to stop the motor
 THROTTLE_MAX =  0.6
 
 def scale(val, src, dst):
@@ -40,11 +40,11 @@ if __name__ == '__main__':
 
     while True:
         # print(evdev.categorize(event))
-        r, w, x = select([gamepad.fd], [], [], timeout=1.0)
+        r, w, x = select([gamepad.fd], [], [], TIME_TO_STOP)
         if r:
             for event in gamepad.read():
                 now = time()
-                if event.type == 3:      # Analog stick
+                if event.type == 3 and (event.code == 0 or event.code == 1):      # Analog stick
                     if not start_stop_state:
                         start_stop_state = True
                         enable_state_req(start_stop_state)
