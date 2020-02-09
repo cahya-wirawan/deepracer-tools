@@ -11,7 +11,6 @@ from ctrl_pkg.srv import (ActiveStateSrv,
 ROS_RATE = 20   # 20hz
 TIME_DIFF = 1.0/ROS_RATE
 TIME_TO_STOP = 1.0  # 1 seconds to stop the motor
-THROTTLE_MAX =  0.6
 throttle_max = 0.6
 
 def scale(val, src, dst):
@@ -46,14 +45,14 @@ if __name__ == '__main__':
             for event in gamepad.read():
                 now = time()
                 if event.type == 1:      # Right Button
-                    if event.code == 304:  #BTN_SOUTH
+                    if event.code == 304 and event.value == 1:  #BTN_SOUTH
                         start_stop_state = not start_stop_state
                         enable_state_req(start_stop_state)
                         rospy.loginfo("###### START/STOP: " + str(start_stop_state))
-                    elif event.code == 307:    #BTN_NORTH
+                    elif event.code == 307 and event.value == 1:    #BTN_NORTH
                         throttle_max = min(1.0, throttle_max + 0.1)
                         rospy.loginfo("###### throttle_max: " + str(throttle_max))
-                    elif event.code == 308:    #BTN_WEST
+                    elif event.code == 308 and event.value == 1:    #BTN_WEST
                         throttle_max = max(0.3, throttle_max - 0.1)
                         rospy.loginfo("###### throttle_max: " + str(throttle_max))
                 if event.type == 3 and (event.code == 0 or event.code == 1):      # Analog stick
@@ -75,7 +74,7 @@ if __name__ == '__main__':
                             try:
                                 if not rospy.is_shutdown():
                                     msg.angle = angle
-                                    msg.throttle = THROTTLE_MAX * throttle
+                                    msg.throttle = throttle_max * throttle
                                     pub_manual_drive.publish(msg)
                                     rospy.loginfo(msg)
                                     last_time = now
