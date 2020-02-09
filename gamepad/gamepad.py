@@ -12,6 +12,7 @@ ROS_RATE = 20   # 20hz
 TIME_DIFF = 1.0/ROS_RATE
 TIME_TO_STOP = 1.0  # 1 seconds to stop the motor
 THROTTLE_MAX =  0.6
+throttle_max = 0.6
 
 def scale(val, src, dst):
     return (float(val - src[0]) / (src[1] - src[0])) * (dst[1] - dst[0]) + dst[0]
@@ -44,6 +45,17 @@ if __name__ == '__main__':
         if r:
             for event in gamepad.read():
                 now = time()
+                if event.type == 1:      # Right Button
+                    if event.code == 304:  #BTN_SOUTH
+                        start_stop_state = not start_stop_state
+                        enable_state_req(start_stop_state)
+                        rospy.loginfo("###### START/STOP: " + str(start_stop_state))
+                    elif event.code == 307:    #BTN_NORTH
+                        throttle_max = min(1.0, throttle_max + 0.1)
+                        rospy.loginfo("###### throttle_max: " + str(throttle_max))
+                    elif event.code == 308:    #BTN_WEST
+                        throttle_max = max(0.3, throttle_max - 0.1)
+                        rospy.loginfo("###### throttle_max: " + str(throttle_max))
                 if event.type == 3 and (event.code == 0 or event.code == 1):      # Analog stick
                     if now - last_time < TIME_DIFF:
                         continue
@@ -54,7 +66,7 @@ if __name__ == '__main__':
                         y_axis = scale_stick(event.value)
                         throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
                         throttle = - math.copysign(throttle, y_axis)
-                    if not start_stop_state and abs(angle) >= 0.0 and abs(throttle) >= 0.0:
+                    if not start_stop_state and abs(angle) >= 0.1 and abs(throttle) >= 0.1:
                         start_stop_state = True
                         enable_state_req(start_stop_state)
                         rospy.loginfo("###### START")
