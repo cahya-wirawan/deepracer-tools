@@ -50,7 +50,7 @@ if __name__ == '__main__':
                         motor_state = not motor_state
                         start_stop_state = not start_stop_state
                         enable_state_req(start_stop_state)
-                        rospy.loginfo("###### START/STOP: " + str(start_stop_state) + ":" + + str(motor_state))
+                        rospy.loginfo("###### START/STOP: " + str(start_stop_state) + ":" + str(motor_state))
                     elif event.code == 307 and event.value == 1:    #BTN_NORTH
                         throttle_max = min(1.0, throttle_max + 0.1)
                         rospy.loginfo("###### throttle_max: " + str(throttle_max))
