@@ -84,7 +84,6 @@ if __name__ == '__main__':
                                 print("ROS exit")
                                 exit(0)
         else:
-            rospy.loginfo("###### WILL STOP")
             if start_stop_state:
                 start_stop_state = False
                 enable_state_req(start_stop_state)
