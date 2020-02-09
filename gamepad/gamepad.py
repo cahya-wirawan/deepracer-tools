@@ -78,7 +78,7 @@ if __name__ == '__main__':
                                     msg.angle = angle
                                     msg.throttle = throttle_max * throttle
                                     pub_manual_drive.publish(msg)
-                                    rospy.loginfo(msg)
+                                    # rospy.loginfo(msg)
                                     last_time = now
                             except rospy.ROSInterruptException:
                                 print("ROS exit")
