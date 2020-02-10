@@ -6,6 +6,7 @@ It's a DRAFT
 - bluetooth usb controller
 - python module evdev
 ## Installation and Setup
+Following steps have to be done in the deepracer after you login using ssh.  
 ### 
 ```
 # pip install evdev
