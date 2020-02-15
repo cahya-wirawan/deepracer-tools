@@ -11,7 +11,7 @@ from ctrl_pkg.srv import (ActiveStateSrv,
 ROS_RATE = 20   # 20hz
 TIME_DIFF = 1.0/ROS_RATE
 TIME_TO_STOP = 1.0  # 1 seconds to stop the motor
-X_AXIS_THRESHOLD = 0.7
+X_AXIS_THRESHOLD = 0.85
 throttle_max = 0.6
 motor_state = True
 
