@@ -11,6 +11,7 @@ from ctrl_pkg.srv import (ActiveStateSrv,
 ROS_RATE = 20   # 20hz
 TIME_DIFF = 1.0/ROS_RATE
 TIME_TO_STOP = 1.0  # 1 seconds to stop the motor
+X_AXIS_THRESHOLD = 0.7
 throttle_max = 0.6
 motor_state = True
 
@@ -67,6 +68,11 @@ if __name__ == '__main__':
                         y_axis = scale_stick(event.value)
                         throttle = min(1.0, math.sqrt(y_axis*y_axis + x_axis*x_axis))
                         throttle = - math.copysign(throttle, y_axis)
+                        # Reduce the throttle if abs(x_axis) near 1 so throttle doesn't make big change abruptly
+                        # when +y_axis switch to -y_axis
+                        if abs(x_axis) > X_AXIS_THRESHOLD:
+                            throttle_scale = (1.0 - abs(x_axis)) / (1.0 - X_AXIS_THRESHOLD)
+                            throttle = throttle_scale * throttle
                     if motor_state and not start_stop_state and abs(angle) >= 0.1 and abs(throttle) >= 0.1:
                         start_stop_state = True
                         enable_state_req(start_stop_state)
