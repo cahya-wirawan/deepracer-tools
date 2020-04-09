@@ -42,6 +42,10 @@ if [ $c_flag -eq 1 ]; then
     exit 1
   fi
   ARN=$(echo $LEADERBOARDS | jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+  if [ -z "$ARN" ]; then
+    LEADERBOARDS=$(./aws-listPrivateLeaderboards)
+    ARN=$(echo $LEADERBOARDS | jq '.PrivateLeaderboards[]|select(.Arn|test("'$SEASON'$"))|.Arn'|sed 's/"//g')
+  fi
 else
   LEADERBOARDS=$(./aws-listLeaderboards)
   echo $LEADERBOARDS | jq '.error[0]' | grep authenticate > /dev/null
